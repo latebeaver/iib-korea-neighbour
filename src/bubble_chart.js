@@ -20,15 +20,15 @@ function bubbleChart() {
   // on which view mode is selected.
   var center = { x: width / 2, y: height / 2 };
 
-  var yearCenters = {
-    2008: { x: width / 3, y: height / 2 },
-    2009: { x: 2 * width / 3, y: height / 2 }
+  var responseCenters = {
+    Yes: { x: width / 3, y: height / 2 },
+    No: { x: 2 * width / 3, y: height / 2 }
   };
 
   // X locations of the year titles.
-  var yearsTitleX = {
-    2008: 300,
-    2009: width - 300
+  var responsesTitleX = {
+    Yes: 300,
+    No: width - 300
   };
 
   // @v4 strength to apply to the position forces
@@ -74,8 +74,8 @@ function bubbleChart() {
   // Nice looking colors - no reason to buck the trend
   // @v4 scales now have a flattened naming scheme
   var fillColor = d3.scaleOrdinal()
-    .domain(['low', 'medium', 'high'])
-    .range(['#203864', '#E57E79', '#beccae']);
+    .domain(['Yes', 'No'])
+    .range(['#203864', '#E57E79']);
 
 
   /*
@@ -93,7 +93,7 @@ function bubbleChart() {
   function createNodes(rawData) {
     // Use the max total_amount in the data as the max in the scale's domain
     // note we have to ensure the total_amount is a number.
-    var maxAmount = d3.max(rawData, function (d) { return +d.total_amount; });
+    var maxAmount = d3.max(rawData, function (d) { return +d.id; });
 
     // Sizes bubbles based on area.
     // @v4: new flattened scale names.
@@ -109,12 +109,13 @@ function bubbleChart() {
       return {
         id: d.id,
         radius: 6,
-        value: +d.total_amount,
-        name: d.grant_title,
-        org: d.organization,
+        value: +d.id,
+        //name: d.grant_title,
+        //org: d.organization,
+        demo: d.demo,
         group: d.group,
-        year: d.start_year,
-        x: Math.random() * 900,
+        response: d.response,
+        x: Math.random() * 800,
         y: Math.random() * 800
       };
     });
@@ -161,7 +162,7 @@ function bubbleChart() {
     var bubblesE = bubbles.enter().append('circle')
       .classed('bubble', true)
       .attr('r', 0)
-      .attr('fill', function (d) { return fillColor(d.group); })
+      .attr('fill', function (d) { return fillColor(d.response); })
       //.attr('stroke', function (d) { return d3.rgb(fillColor(d.group)).darker(); })
       .attr('stroke-width', 2)
       //.on('mouseover', showDetail)
@@ -206,8 +207,8 @@ function bubbleChart() {
    * Provides a x value for each node to be used with the split by year
    * x force.
    */
-  function nodeYearPos(d) {
-    return yearCenters[d.year].x;
+  function nodeResponsePos(d) {
+    return responseCenters[d.response].x;
   }
 
 
@@ -218,7 +219,7 @@ function bubbleChart() {
    * center of the visualization.
    */
   function groupBubbles() {
-    hideYearTitles();
+    hideResponseTitles();
 
     // @v4 Reset the 'x' force to draw the bubbles to the center.
     simulation.force('x', d3.forceX().strength(forceStrength).x(center.x));
@@ -235,10 +236,10 @@ function bubbleChart() {
    * yearCenter of their data's year.
    */
   function splitBubbles() {
-    showYearTitles();
+    showResponseTitles();
 
     // @v4 Reset the 'x' force to draw the bubbles to their year centers
-    simulation.force('x', d3.forceX().strength(forceStrength).x(nodeYearPos));
+    simulation.force('x', d3.forceX().strength(forceStrength).x(nodeResponsePos));
 
     // @v4 We can reset the alpha value and restart the simulation
     simulation.alpha(1).restart();
@@ -247,23 +248,23 @@ function bubbleChart() {
   /*
    * Hides Year title displays.
    */
-  function hideYearTitles() {
-    svg.selectAll('.year').remove();
+  function hideResponseTitles() {
+    svg.selectAll('.response').remove();
   }
 
   /*
    * Shows Year title displays.
    */
-  function showYearTitles() {
+  function showResponseTitles() {
     // Another way to do this would be to create
     // the year texts once and then just hide them.
-    var yearsData = d3.keys(yearsTitleX);
-    var years = svg.selectAll('.year')
-      .data(yearsData);
+    var responsesData = d3.keys(responsesTitleX);
+    var responses = svg.selectAll('.response')
+      .data(responsesData);
 
-    years.enter().append('text')
-      .attr('class', 'year')
-      .attr('x', function (d) { return yearsTitleX[d]; })
+    responses.enter().append('text')
+      .attr('class', 'response')
+      .attr('x', function (d) { return responsesTitleX[d]; })
       .attr('y', 80)
       .attr('text-anchor', 'middle')
       .text(function (d) { return d; });
@@ -279,13 +280,13 @@ function bubbleChart() {
     d3.select(this).attr('stroke', 'black');
 
     var content = '<span class="name">Title: </span><span class="value">' +
-                  d.name +
+                  d.group +
                   '</span><br/>' +
                   '<span class="name">Amount: </span><span class="value">$' +
                   addCommas(d.value) +
                   '</span><br/>' +
-                  '<span class="name">Year: </span><span class="value">' +
-                  d.year +
+                  '<span class="name">Response: </span><span class="value">' +
+                  d.response +
                   '</span>';
 
     tooltip.showTooltip(content, d3.event);
@@ -310,7 +311,7 @@ function bubbleChart() {
    * displayName is expected to be a string and either 'year' or 'all'.
    */
   chart.toggleDisplay = function (displayName) {
-    if (displayName === 'year') {
+    if (displayName === 'response') {
       splitBubbles();
     } else {
       groupBubbles();
@@ -383,7 +384,7 @@ function addCommas(nStr) {
 }
 
 // Load the data.
-d3.csv('data/gates_money.csv', display);
+d3.csv('data/immigrant_neighbour.csv', display);
 
 // setup the buttons.
 setupButtons();
