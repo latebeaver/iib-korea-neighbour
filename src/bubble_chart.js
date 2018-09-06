@@ -1,10 +1,6 @@
-/* bubbleChart creation function. Returns a function that will
- * instantiate a new bubble chart given a DOM element to display
- * it in and a dataset to visualize.
- *
- * Organization and style inspired by:
- * https://bost.ocks.org/mike/chart/
- *
+/* Bubble Chart
+ * Based on Jim Vallandingham's work
+ * http://vallandingham.me/bubble_chart_v4/
  */
 function bubbleChart() {
   // Constants for sizing
@@ -25,7 +21,7 @@ function bubbleChart() {
     No: { x: 2 * width / 3, y: height / 2 }
   };
 
-  // X locations of the year titles.
+  // X locations of the response titles.
   var responsesTitleX = {
     Yes: 300,
     No: width - 300
@@ -93,7 +89,7 @@ function bubbleChart() {
   function createNodes(rawData) {
     // Use the max total_amount in the data as the max in the scale's domain
     // note we have to ensure the total_amount is a number.
-    var maxAmount = d3.max(rawData, function (d) { return +d.id; });
+    var maxAmount = d3.max(rawData, function (d) { return +d.radius; });
 
     // Sizes bubbles based on area.
     // @v4: new flattened scale names.
@@ -121,7 +117,7 @@ function bubbleChart() {
     });
 
     // sort them to prevent occlusion of smaller nodes.
-    myNodes.sort(function (a, b) { return b.value - a.value; });
+    myNodes.sort(function (a, b) { return b.radius - a.radius; });
 
     return myNodes;
   }
@@ -181,10 +177,6 @@ function bubbleChart() {
     // @v4 Once we set the nodes, the simulation will start running automatically!
     simulation.nodes(nodes);
 
-// Collision 테스트
-
-
-
 
     // Set initial layout to single group.
     groupBubbles();
@@ -204,7 +196,7 @@ function bubbleChart() {
   }
 
   /*
-   * Provides a x value for each node to be used with the split by year
+   * Provides a x value for each node to be used with the split by response
    * x force.
    */
   function nodeResponsePos(d) {
@@ -214,7 +206,7 @@ function bubbleChart() {
 
   /*
    * Sets visualization in "single group mode".
-   * The year labels are hidden and the force layout
+   * The response labels are hidden and the force layout
    * tick function is set to move all nodes to the
    * center of the visualization.
    */
@@ -230,15 +222,15 @@ function bubbleChart() {
 
 
   /*
-   * Sets visualization in "split by year mode".
-   * The year labels are shown and the force layout
+   * Sets visualization in "split by response mode".
+   * The response labels are shown and the force layout
    * tick function is set to move nodes to the
-   * yearCenter of their data's year.
+   * responseCenter of their data's response.
    */
   function splitBubbles() {
     showResponseTitles();
 
-    // @v4 Reset the 'x' force to draw the bubbles to their year centers
+    // @v4 Reset the 'x' force to draw the bubbles to their response centers
     simulation.force('x', d3.forceX().strength(forceStrength).x(nodeResponsePos));
 
     // @v4 We can reset the alpha value and restart the simulation
@@ -246,18 +238,18 @@ function bubbleChart() {
   }
 
   /*
-   * Hides Year title displays.
+   * Hides Response title displays.
    */
   function hideResponseTitles() {
     svg.selectAll('.response').remove();
   }
 
   /*
-   * Shows Year title displays.
+   * Shows Response title displays.
    */
   function showResponseTitles() {
     // Another way to do this would be to create
-    // the year texts once and then just hide them.
+    // the response texts once and then just hide them.
     var responsesData = d3.keys(responsesTitleX);
     var responses = svg.selectAll('.response')
       .data(responsesData);
@@ -275,7 +267,7 @@ function bubbleChart() {
    * Function called on mouseover to display the
    * details of a bubble in the tooltip.
    */
-  function showDetail(d) {
+  /* function showDetail(d) {
     // change outline to indicate hover state.
     d3.select(this).attr('stroke', 'black');
 
@@ -290,25 +282,25 @@ function bubbleChart() {
                   '</span>';
 
     tooltip.showTooltip(content, d3.event);
-  }
+  } */
 
   /*
    * Hides tooltip
    */
-  function hideDetail(d) {
+  /* function hideDetail(d) {
     // reset outline
     d3.select(this)
       .attr('stroke', d3.rgb(fillColor(d.group)).darker());
 
     tooltip.hideTooltip();
-  }
+  } */
 
   /*
    * Externally accessible function (this is attached to the
    * returned chart function). Allows the visualization to toggle
-   * between "single group" and "split by year" modes.
+   * between "single group" and "split by response" modes.
    *
-   * displayName is expected to be a string and either 'year' or 'all'.
+   * displayName is expected to be a string and either 'response' or 'all'.
    */
   chart.toggleDisplay = function (displayName) {
     if (displayName === 'response') {
@@ -342,6 +334,7 @@ function display(error, data) {
   myBubbleChart('#vis', data);
 }
 
+
 /*
  * Sets up the layout buttons to allow for toggling between view modes.
  */
@@ -370,7 +363,7 @@ function setupButtons() {
  * Helper function to convert a number into a string
  * and add commas to it to improve presentation.
  */
-function addCommas(nStr) {
+/* function addCommas(nStr) {
   nStr += '';
   var x = nStr.split('.');
   var x1 = x[0];
@@ -381,7 +374,7 @@ function addCommas(nStr) {
   }
 
   return x1 + x2;
-}
+} */
 
 // Load the data.
 d3.csv('data/immigrant_neighbour.csv', display);

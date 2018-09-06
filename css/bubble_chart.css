@@ -2,7 +2,7 @@ a, a:visited, a:active {
   color: #444;
 }
 
-.container {
+#chart {
   max-width: 900px;
   margin: auto;
 }
@@ -32,6 +32,13 @@ a, a:visited, a:active {
 
 #toolbar {
   margin-top: 10px;
+}
+
+#intro {
+  width: 940px;
+  height: 600px;
+  clear: both;
+  margin-bottom: 10px;
 }
 
 .response {
