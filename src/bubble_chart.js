@@ -27,6 +27,13 @@ function bubbleChart() {
     No: width - 300
   };
 
+  // X locations of the count node labels.
+
+  var nodecountLabelX = {
+    "70%": 300,
+    "30%": width - 300
+  };
+
   // @v4 strength to apply to the position forces
   var forceStrength = 0.08;
 
@@ -71,7 +78,7 @@ function bubbleChart() {
   // @v4 scales now have a flattened naming scheme
   var fillColor = d3.scaleOrdinal()
     .domain(['Yes', 'No'])
-    .range(['#203864', '#E57E79']);
+    .range(['#18cd3d', '#1c4a63']);
 
 
   /*
@@ -212,6 +219,7 @@ function bubbleChart() {
    */
   function groupBubbles() {
     hideResponseTitles();
+    hideNodecountLabels();
 
     // @v4 Reset the 'x' force to draw the bubbles to the center.
     simulation.force('x', d3.forceX().strength(forceStrength).x(center.x));
@@ -229,6 +237,7 @@ function bubbleChart() {
    */
   function splitBubbles() {
     showResponseTitles();
+    showNodecountLabels();
 
     // @v4 Reset the 'x' force to draw the bubbles to their response centers
     simulation.force('x', d3.forceX().strength(forceStrength).x(nodeResponsePos));
@@ -242,6 +251,10 @@ function bubbleChart() {
    */
   function hideResponseTitles() {
     svg.selectAll('.response').remove();
+  }
+
+  function hideNodecountLabels() {
+    svg.selectAll('.nodecount').remove();
   }
 
   /*
@@ -261,6 +274,22 @@ function bubbleChart() {
       .attr('text-anchor', 'middle')
       .text(function (d) { return d; });
   }
+
+  function showNodecountLabels() {
+    // Another way to do this would be to create
+    // the response texts once and then just hide them.
+    var nodecountData = d3.keys(nodecountLabelX);
+    var nodecount = svg.selectAll('.nodecount')
+      .data(nodecountData);
+
+    nodecount.enter().append('text')
+      .attr('class', 'nodecount')
+      .attr('x', function (d) { return nodecountLabelX[d]; })
+      .attr('y', 500)
+      .attr('text-anchor', 'middle')
+      .text(function (d) { return d; });
+  }
+
 
 
   /*
