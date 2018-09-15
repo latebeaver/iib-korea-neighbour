@@ -5,7 +5,7 @@
 function bubbleChart() {
   // Constants for sizing
   var width = 940;
-  var height = 600;
+  var height = 550;
   var padding = 2;
   var maxRadius = 6;
 
@@ -23,15 +23,15 @@ function bubbleChart() {
 
   // X locations of the response titles.
   var responsesTitleX = {
-    Yes: 300,
-    No: width - 300
+    Yes: width / 3,
+    No: 2 * width / 3
   };
 
   // X locations of the count node labels.
 
   var nodecountLabelX = {
-    "70%": 300,
-    "30%": width - 300
+    "그렇다: 68.2%": width / 4,
+    "아니다: 31.8%": width - width / 4
   };
 
   // @v4 strength to apply to the position forces
@@ -64,7 +64,7 @@ function bubbleChart() {
   // @v4 We create a force simulation now and
   //  add forces to it.
   var simulation = d3.forceSimulation()
-    .velocityDecay(0.2)
+    .velocityDecay(0.12)
     .force('x', d3.forceX().strength(forceStrength).x(center.x))
     .force('y', d3.forceY().strength(forceStrength).y(center.y))
     .force('charge', d3.forceManyBody().strength(charge))
@@ -78,7 +78,8 @@ function bubbleChart() {
   // @v4 scales now have a flattened naming scheme
   var fillColor = d3.scaleOrdinal()
     .domain(['Yes', 'No'])
-    .range(['#18cd3d', '#1c4a63']);
+    .range(['#00A99F', '#8BF25A']);
+    //.range(['#18cd3d', '#FFD000']);
 
 
   /*
@@ -111,7 +112,7 @@ function bubbleChart() {
     var myNodes = rawData.map(function (d) {
       return {
         id: d.id,
-        radius: 6,
+        radius: 2,
         value: +d.id,
         //name: d.grant_title,
         //org: d.organization,
@@ -236,7 +237,7 @@ function bubbleChart() {
    * responseCenter of their data's response.
    */
   function splitBubbles() {
-    showResponseTitles();
+    //showResponseTitles();
     showNodecountLabels();
 
     // @v4 Reset the 'x' force to draw the bubbles to their response centers
@@ -260,7 +261,7 @@ function bubbleChart() {
   /*
    * Shows Response title displays.
    */
-  function showResponseTitles() {
+  /* function showResponseTitles() {
     // Another way to do this would be to create
     // the response texts once and then just hide them.
     var responsesData = d3.keys(responsesTitleX);
@@ -270,10 +271,10 @@ function bubbleChart() {
     responses.enter().append('text')
       .attr('class', 'response')
       .attr('x', function (d) { return responsesTitleX[d]; })
-      .attr('y', 80)
+      .attr('y', 60)
       .attr('text-anchor', 'middle')
       .text(function (d) { return d; });
-  }
+  }*/
 
   function showNodecountLabels() {
     // Another way to do this would be to create
@@ -285,7 +286,7 @@ function bubbleChart() {
     nodecount.enter().append('text')
       .attr('class', 'nodecount')
       .attr('x', function (d) { return nodecountLabelX[d]; })
-      .attr('y', 500)
+      .attr('y', 540)
       .attr('text-anchor', 'middle')
       .text(function (d) { return d; });
   }
@@ -406,7 +407,7 @@ function setupButtons() {
 } */
 
 // Load the data.
-d3.csv('data/immigrant_neighbour.csv', display);
+d3.csv('data/immigrant_neighbour_n.csv', display);
 
 // setup the buttons.
 setupButtons();
